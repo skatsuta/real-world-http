@@ -2,10 +2,12 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"log"
 	"mime/multipart"
 	"net/http"
+	"net/textproto"
 	"os"
 )
 
@@ -15,7 +17,10 @@ func main() {
 	w.WriteField("name", "John")
 
 	fileName := os.Args[1]
-	fw, err := w.CreateFormFile("file", fileName)
+	part := make(textproto.MIMEHeader)
+	part.Set("Content-Type", "text/plain")
+	part.Set("Content-Disposition", fmt.Sprintf(`form-data; name="file"; filename="%s"`, fileName))
+	fw, err := w.CreatePart(part)
 	if err != nil {
 		panic(err)
 	}
